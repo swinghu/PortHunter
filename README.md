@@ -79,9 +79,11 @@ git push origin main --follow-tags
 
 | 平台 | runner | 产物 |
 | --- | --- | --- |
-| Windows x64 | windows-latest（MSVC，raylib 由 FetchContent 源码编译） | `port_killer-<ver>-windows-x64.zip` |
+| Windows x64 | windows-latest（MSVC） | `port_killer-<ver>-windows-x64.zip` |
 | Linux x64 | ubuntu-22.04 | `port_killer-<ver>-linux-x64.deb` 与 `.tar.gz` |
-| macOS arm64 | macos-14（brew 安装 raylib） | `port_killer-<ver>-macos-arm64.dmg`（含 .app，可拖到 Applications） |
+| macOS arm64 | macos-14 | `port_killer-<ver>-macos-arm64.dmg`（含 .app，可拖到 Applications） |
+
+三端统一由 CMake 的 FetchContent 拉取 raylib 5.5 源码编译，不依赖 runner 上的 raylib 版本，避免 mac 与 win/linux 行为不一致。
 
 注意事项：
 

@@ -45,10 +45,6 @@ jobs:
           sudo apt-get install -y libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev \
             libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libasound2-dev
 
-      - name: 安装 macOS raylib
-        if: runner.os == 'macOS'
-        run: brew install raylib
-
       - name: 配置
         shell: bash
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPORT_KILLER_VERSION="${{ steps.ver.outputs.value }}"
