@@ -6,6 +6,10 @@
 
 <br clear="all" />
 
+![端口猎手运行界面](assets/screenshot.png)
+
+> 左侧输入端口号（回车即查），右侧列出占用该端口的进程，可复制杀进程命令或直接结束。
+
 界面为左右分栏：左侧输入端口、常用端口快捷入口、查询历史；右侧结果表格（PID / 进程名 / 用户 / 协议 / 监听地址 / 可执行路径）与操作按钮。
 
 - UI：[raylib](https://www.raylib.com)（C++，立即模式绘制，无额外 UI 依赖）
@@ -124,6 +128,7 @@ git push origin main --follow-tags
 CMakeLists.txt
 .github/workflows/release.yml        三端打包 + 发 Release
 assets/icon.png                      图标母图
+assets/screenshot.png                README 顶部运行界面展示图
 assets/icon.ico                      Windows exe 图标
 assets/icons/                        Linux hicolor 图标
 packaging/Info.plist.in              macOS .app 元信息
