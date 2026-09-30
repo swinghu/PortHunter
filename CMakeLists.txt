@@ -44,7 +44,7 @@ if(MSVC)
 endif()
 
 if(WIN32)
-    target_link_libraries(port_killer PRIVATE iphelper32.lib ws2_32.lib psapi.lib advapi32.lib)
+    target_link_libraries(port_killer PRIVATE iphlpapi.lib ws2_32.lib psapi.lib advapi32.lib)
 endif()
 
 if(APPLE)
