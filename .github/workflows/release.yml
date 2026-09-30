@@ -1,0 +1,110 @@
+name: 三端打包发布
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 手动触发时使用的版本号（不带 v 前缀）
+        default: "0.0.0-ci"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+          - name: linux-x64
+            os: ubuntu-22.04
+          - name: macos-arm64
+            os: macos-14
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 解析版本号
+        id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "value=${GITHUB_REF_NAME#v}" >>"$GITHUB_OUTPUT"
+          else
+            echo "value=${{ github.event.inputs.version }}" >>"$GITHUB_OUTPUT"
+          fi
+
+      - name: 安装 Linux 构建依赖
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev \
+            libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libasound2-dev
+
+      - name: 安装 macOS raylib
+        if: runner.os == 'macOS'
+        run: brew install raylib
+
+      - name: 配置
+        shell: bash
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPORT_KILLER_VERSION="${{ steps.ver.outputs.value }}"
+
+      - name: 编译
+        shell: bash
+        run: cmake --build build --config Release
+
+      - name: 生成 zip / deb / tar.gz
+        shell: bash
+        run: cpack --config build/CPackConfig.cmake -B build -C Release
+
+      - name: 生成 macOS dmg
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ steps.ver.outputs.value }}"
+          arch="$(uname -m)"
+          codesign --force --deep --sign - build/bin/port_killer.app
+          rm -rf dmgroot
+          mkdir dmgroot
+          cp -R build/bin/port_killer.app dmgroot/
+          ln -s /Applications dmgroot/Applications
+          hdiutil create -volname "PortKiller ${version}" -srcfolder dmgroot -ov -format UDZO \
+            "port_killer-${version}-macos-${arch}.dmg"
+
+      - name: 汇总产物
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          find build -maxdepth 1 -type f \( -name '*.zip' -o -name '*.deb' -o -name '*.tar.gz' \) | while read -r file; do
+            mv "$file" dist/
+          done
+          find . -maxdepth 1 -type f -name '*.dmg' | while read -r file; do mv "$file" dist/; done
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: port_killer-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: artifacts/*
+          generate_release_notes: true

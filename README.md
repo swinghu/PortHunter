@@ -66,10 +66,36 @@ raylib 未安装时同样走 FetchContent 自动编译。
 
 界面为中文，启动时按平台加载系统字体（Windows `msyh.ttc`、macOS `PingFang.ttc`/`Arial Unicode.ttf`、Linux `NotoSansCJK`/`wqy-microhei`）。若系统没有中文字体，可在项目根目录放 `assets/fonts/ui.ttf`，左下角会提示加载失败并回退到 raylib 默认字体。
 
+## 发布与三端打包
+
+CI 在 `.github/workflows/release.yml`，推 `v*` tag 即自动出三端安装包并挂到 GitHub Release：
+
+```bash
+git tag v0.1.0
+git push origin main --follow-tags
+```
+
+产物命名（`<ver>` 取自 tag，去掉前缀 v）：
+
+| 平台 | runner | 产物 |
+| --- | --- | --- |
+| Windows x64 | windows-latest（MSVC，raylib 由 FetchContent 源码编译） | `port_killer-<ver>-windows-x64.zip` |
+| Linux x64 | ubuntu-22.04 | `port_killer-<ver>-linux-x64.deb` 与 `.tar.gz` |
+| macOS arm64 | macos-14（brew 安装 raylib） | `port_killer-<ver>-macos-arm64.dmg`（含 .app，可拖到 Applications） |
+
+注意事项：
+
+- macOS 产物只做 ad-hoc 签名（`codesign -s -`），没有 Apple 公证，首次打开需右键 →「打开」绕过 Gatekeeper；分发给他人前若要消除提示，需要开发者证书 + `notarytool` 公证。
+- 每个 runner 只产出本机架构：`macos-14` 是 arm64，需要 Intel 或通用二进制要另加 `macos-13` 任务或用 `lipo` 合并。
+- 构建失败后不要给同一个 tag 重新打包（Release 附件会残留旧产物），直接递增版本号重新打 tag。
+- 只想验证流水线而不发版：在 Actions 里手动运行 `workflow_dispatch`，输入版本号（默认 `0.0.0-ci`），只上传 artifact 不发 Release。
+
 ## 目录
 
 ```
 CMakeLists.txt
+.github/workflows/release.yml   三端打包 + 发 Release
+packaging/Info.plist.in         macOS .app 元信息
 src/main.cpp                 窗口、左右分栏布局、交互与确认弹窗
 src/ui_widgets.{h,cpp}       按钮/文本绘制、文字裁剪、格式化
 src/ui_text.{h,cpp}          中文文案表 + 按文案生成字形集加载字体
