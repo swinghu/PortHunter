@@ -70,7 +70,7 @@ std::string FormatEndpoint(ULONG address, ULONG port) {
 
 void CollectTcp(std::vector<ProcessInfo> &out, uint16_t port, bool ipv6) {
     const ULONG family = ipv6 ? AF_INET6 : AF_INET;
-    const ULONG tableClass = TCP_TABLE_OWNER_PID_ALL;
+    const TCP_TABLE_CLASS tableClass = TCP_TABLE_OWNER_PID_ALL;
     ULONG size = 0;
     GetExtendedTcpTable(nullptr, &size, FALSE, family, tableClass, 0);
     if (size == 0) return;
@@ -93,7 +93,7 @@ void CollectTcp(std::vector<ProcessInfo> &out, uint16_t port, bool ipv6) {
         if (GetExtendedTcpTable(table, &size, FALSE, family, tableClass, 0) != NO_ERROR) return;
         for (DWORD i = 0; i < table->dwNumEntries; ++i) {
             const auto &row = table->table[i];
-            if (ntohs(static_cast<unsigned short>(row.ulLocalPort)) != port) continue;
+            if (ntohs(static_cast<unsigned short>(row.dwLocalPort)) != port) continue;
             ProcessInfo info;
             info.pid = static_cast<int>(row.dwOwningPid);
             info.proto = "TCP6";
@@ -127,7 +127,7 @@ void CollectUdp(std::vector<ProcessInfo> &out, uint16_t port, bool ipv6) {
         if (GetExtendedUdpTable(table, &size, FALSE, family, UDP_TABLE_OWNER_PID, 0) != NO_ERROR) return;
         for (DWORD i = 0; i < table->dwNumEntries; ++i) {
             const auto &row = table->table[i];
-            if (ntohs(static_cast<unsigned short>(row.ulLocalPort)) != port) continue;
+            if (ntohs(static_cast<unsigned short>(row.dwLocalPort)) != port) continue;
             ProcessInfo info;
             info.pid = static_cast<int>(row.dwOwningPid);
             info.proto = "UDP6";
