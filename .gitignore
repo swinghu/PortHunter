@@ -14,3 +14,4 @@ dist/
 *.zip
 _CPack_Packages/
 build*/
+.DS_Store
