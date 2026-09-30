@@ -125,10 +125,15 @@ git push origin main --follow-tags
 - 构建失败后不要给同一个 tag 重新打包（Release 附件会残留旧产物），直接递增版本号重新打 tag。
 - 只想验证流水线而不发版：在 Actions 里手动运行 `workflow_dispatch`，输入版本号（默认 `0.0.0-ci`），只上传 artifact 不发 Release。
 
+## 许可
+
+MIT © 2026 swinghu，详见 [LICENSE](LICENSE)。
+
 ## 目录
 
 ```
 CMakeLists.txt
+LICENSE                            MIT 许可
 .github/workflows/release.yml        三端打包 + 发 Release
 assets/icon.png                      图标母图
 assets/screenshot.png                README 顶部运行界面展示图
