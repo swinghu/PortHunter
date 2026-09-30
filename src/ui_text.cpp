@@ -8,8 +8,8 @@
 namespace ui {
 namespace text {
 
-const char *kAppTitle = "端口进程查找";
-const char *kAppSubtitle = "输入被占用的 HTTP 端口，定位占用进程";
+const char *kAppTitle = "端口猎手";
+const char *kAppSubtitle = "输入被占用的 HTTP 端口，定位并结束占用进程";
 const char *kPortLabel = "端口号";
 const char *kPortPlaceholder = "例如 8080";
 const char *kSearch = "查找";

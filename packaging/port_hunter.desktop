@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=PortHunter
+Name[zh_CN]=端口猎手
+GenericName=Port lookup
+GenericName[zh_CN]=端口占用查询
+Comment=Find the process holding an HTTP port and terminate it
+Comment[zh_CN]=查找占用 HTTP 端口的进程并结束它
+Exec=port_hunter
+Icon=port_hunter
+Terminal=false
+Categories=Development;Utility;System;

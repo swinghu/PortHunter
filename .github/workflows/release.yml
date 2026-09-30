@@ -47,7 +47,7 @@ jobs:
 
       - name: 配置
         shell: bash
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPORT_KILLER_VERSION="${{ steps.ver.outputs.value }}"
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DPORT_HUNTER_VERSION="${{ steps.ver.outputs.value }}"
 
       - name: 编译
         shell: bash
@@ -64,13 +64,13 @@ jobs:
           set -euo pipefail
           version="${{ steps.ver.outputs.value }}"
           arch="$(uname -m)"
-          codesign --force --deep --sign - build/bin/port_killer.app
+          codesign --force --deep --sign - build/bin/port_hunter.app
           rm -rf dmgroot
           mkdir dmgroot
-          cp -R build/bin/port_killer.app dmgroot/
+          cp -R build/bin/port_hunter.app dmgroot/
           ln -s /Applications dmgroot/Applications
-          hdiutil create -volname "PortKiller ${version}" -srcfolder dmgroot -ov -format UDZO \
-            "port_killer-${version}-macos-${arch}.dmg"
+          hdiutil create -volname "PortHunter ${version}" -srcfolder dmgroot -ov -format UDZO \
+            "port_hunter-${version}-macos-${arch}.dmg"
 
       - name: 汇总产物
         shell: bash
@@ -85,7 +85,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: port_killer-${{ matrix.name }}
+          name: port_hunter-${{ matrix.name }}
           path: dist/*
           if-no-files-found: error
 

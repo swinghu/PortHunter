@@ -294,6 +294,13 @@ int main(int argc, char *argv[]) {
 
     App app;
     app.font = LoadUiFont(kFontBody, app.fontFallback);
+
+#ifndef __APPLE__
+    // macOS has no window icon (GLFW warns); the .icns in the bundle covers the Dock and Finder.
+    Image icon = {0};
+    if (FileExists("assets/icon.png")) icon = LoadImage("assets/icon.png");
+    if (icon.data != nullptr) SetWindowIcon(icon);  // kept loaded: GLFW may reference the pixels
+#endif
     if (argc > 1) {
         app.portInput = argv[1];
         LaunchScan(app);
