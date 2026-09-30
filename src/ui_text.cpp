@@ -122,7 +122,8 @@ bool FileExists(const char *path) {
 }  // namespace
 
 Font LoadUiFont(int fontSize, bool &fellBackToDefault) {
-    const auto codepoints = BuildCodepoints();
+    // raylib takes a mutable codepoint array, so this vector must not be const.
+    auto codepoints = BuildCodepoints();
     for (const char *const *candidate = FontCandidates(); *candidate; ++candidate) {
         if (!FileExists(*candidate)) continue;
         Font font = LoadFontEx(*candidate, fontSize, codepoints.data(), static_cast<int>(codepoints.size()));

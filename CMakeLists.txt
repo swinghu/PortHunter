@@ -33,6 +33,10 @@ endif()
 add_executable(port_killer ${SOURCES})
 target_link_libraries(port_killer PRIVATE raylib)
 
+# std::async needs the platform thread library; GCC fails to link it without this.
+find_package(Threads REQUIRED)
+target_link_libraries(port_killer PRIVATE Threads::Threads)
+
 if(MSVC)
     # Source files are UTF-8 with Chinese UI strings; MSVC otherwise guesses the local codepage.
     target_compile_options(port_killer PRIVATE /utf-8)

@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 
-#include <windows.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN  // keep windows.h from pulling winsock.h, which clashes with winsock2.h
+#endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h>
 #include <iphlpapi.h>
-#include <psapi.h>
 #include <sddl.h>
 
 namespace {

@@ -1,5 +1,6 @@
 #include "ui_widgets.h"
 
+#include <algorithm>
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
