@@ -54,20 +54,23 @@ iconutil -c icns /tmp/hs.iconset -o packaging/port_hunter.icns
 
 ```bash
 brew install cmake raylib
-cmake -S . -B build -DCMAKE_PREFIX_PATH=/opt/homebrew -DCMAKE_BUILD_TYPE=Release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 open build/bin/port_hunter.app        # 或 ./build/bin/port_hunter.app/Contents/MacOS/port_hunter 8080
 ```
 
+Apple Silicon 上 CMake 会自动找到 Homebrew 前缀；若 `find_package` 没命中，再加 `-DCMAKE_PREFIX_PATH=/opt/homebrew`（Intel 机器是 `/usr/local`）。注意 brew 目前是 raylib 6.0，而 CI 固定用 5.5，本地跑通不代表 CI 版本一致，需要严格复现时删掉 brew 依赖让 CMake 走 FetchContent。
+
 ### Linux
 
 ```bash
-sudo apt install cmake libglfw3-dev libgl1-mesa-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev
+sudo apt install cmake libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev \
+  libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libasound2-dev
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
 ./build/bin/port_hunter
 ```
 
-发行版若自带 raylib（`libraylib-dev`），CMake 会自动链接；否则首次配置会联网从 GitHub 拉取源码编译。
+`libasound2-dev` 不能省：raylib 的 raudio 需要 ALSA 头文件，缺了会在编译阶段报错。发行版若自带 raylib（`libraylib-dev`），CMake 会自动链接；否则首次配置会联网从 GitHub 拉取 5.5 源码编译。
 
 ### Windows
 
@@ -76,10 +79,10 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build
 ```bat
 cmake -S . -B build
 cmake --build build --config Release
-build\Release\port_hunter.exe
+build\bin\port_hunter.exe
 ```
 
-raylib 未安装时同样走 FetchContent 自动编译。
+VS 是多配置生成器，产物默认会再多一层 `Release\` 子目录；本工程在 CMakeLists 里把 `CMAKE_RUNTIME_OUTPUT_DIRECTORY_<CONFIG>` 钉死为 `build/bin`，所以三端路径一致。raylib 未安装时同样走 FetchContent 自动编译。
 
 命令行传入端口可跳过手动输入：`port_hunter 8080`。
 

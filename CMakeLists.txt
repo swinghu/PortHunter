@@ -8,6 +8,10 @@ project(port_hunter VERSION ${PORT_HUNTER_VERSION} LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Visual Studio appends a per-config subfolder; pin it so all generators emit build/bin/<tool>.
+foreach(config IN ITEMS DEBUG RELEASE MINSIZEREL RELWITHDEBINFO)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} ${CMAKE_BINARY_DIR}/bin)
+endforeach()
 
 find_package(raylib CONFIG QUIET)
 if(NOT TARGET raylib)
